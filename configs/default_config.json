@@ -1,0 +1,24 @@
+{
+  "dataset_name": "HIV",
+  "data_dir": "dataset",
+  "task_type": "classification",
+  "batch_size": 32,
+  "num_epochs": 50,
+  "learning_rate": 1e-4,
+  "weight_decay": 1e-5,
+  "lambda_contrastive": 0.1,
+  "temperature": 0.07,
+  "atom_dim": 41,
+  "bond_dim": 10,
+  "graph_dim": 512,
+  "smiles_dim": 3072,
+  "hidden_dim": 512,
+  "num_layers": 3,
+  "num_heads": 8,
+  "checkpoint_dir": "checkpoints",
+  "use_local_fallback": true,
+  "openai_api_key": null,
+  "num_workers": 0,
+  "seed": 42
+}
+
