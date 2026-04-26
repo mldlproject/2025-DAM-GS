@@ -1,7 +1,4 @@
 # Dual-Attention Multimodal Framework for Molecular Property Prediction
-
-This README reflects the current state of the code in this branch.
-
 ## Overview
 
 The model uses two branches:
@@ -12,6 +9,42 @@ The model uses two branches:
 - Output heads: classification, multilabel classification, or regression
 
 The main training entry point is `run_training.py` (not `training/train.py` directly).
+
+## Project Structure
+
+```text
+.
+|-- configs/
+|   `-- default_config.json
+|-- data/
+|   `-- dataset.py
+|-- dataset/
+|   |-- BACE.csv
+|   |-- BBBP.csv
+|   |-- ClinTox.csv
+|   |-- ESOL.csv
+|   |-- FreeSolv.csv
+|   |-- HIV.csv
+|   |-- Lipophilicity.csv
+|   |-- SIDER.csv
+|   `-- Tox21.csv
+|-- embeddings/
+|   `-- *_embeddings.npy
+|-- inference/
+|   `-- predict.py
+|-- models/
+|   |-- cross_attention.py
+|   |-- dagt.py
+|   `-- llm_encoder.py
+|-- training/
+|   |-- losses.py
+|   `-- train.py
+|-- evaluate.py
+|-- requirements.txt
+|-- run_training.py
+`-- README.md
+```
+
 
 ## Installation
 
@@ -100,37 +133,3 @@ Arguments:
 The repo includes `evaluate.py` for evaluating checkpoints on train/val/test splits and for scanning a checkpoint directory.
 
 
-## Project Structure
-
-```text
-.
-|-- configs/
-|   `-- default_config.json
-|-- data/
-|   `-- dataset.py
-|-- dataset/
-|   |-- BACE.csv
-|   |-- BBBP.csv
-|   |-- ClinTox.csv
-|   |-- ESOL.csv
-|   |-- FreeSolv.csv
-|   |-- HIV.csv
-|   |-- Lipophilicity.csv
-|   |-- SIDER.csv
-|   `-- Tox21.csv
-|-- embeddings/
-|   `-- *_embeddings.npy
-|-- inference/
-|   `-- predict.py
-|-- models/
-|   |-- cross_attention.py
-|   |-- dagt.py
-|   `-- llm_encoder.py
-|-- training/
-|   |-- losses.py
-|   `-- train.py
-|-- evaluate.py
-|-- requirements.txt
-|-- run_training.py
-`-- README.md
-```
