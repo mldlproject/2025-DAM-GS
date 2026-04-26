@@ -14,9 +14,11 @@ class ContrastiveLoss(nn.Module):
     Based on InfoNCE loss.
     """
     
-    def __init__(self, temperature=0.07):
+    def __init__(self, graph_dim=512, smiles_dim=3072, projection_dim=512, temperature=0.07):
         super(ContrastiveLoss, self).__init__()
         self.temperature = temperature
+        self.graph_projection = nn.Linear(graph_dim, projection_dim)
+        self.smiles_projection = nn.Linear(smiles_dim, projection_dim)
     
     def forward(self, h_g, h_s):
         """
@@ -26,6 +28,8 @@ class ContrastiveLoss(nn.Module):
         Returns:
             loss: Contrastive loss value
         """
+        h_g = self.graph_projection(h_g)
+        h_s = self.smiles_projection(h_s)
         batch_size = h_g.size(0)
         
         # Normalize embeddings

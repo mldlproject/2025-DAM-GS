@@ -31,6 +31,16 @@ class Predictor:
         
         # Determine number of classes
         num_classes = self.config.get('num_classes', 2)
+
+        state_dict = checkpoint.get('model_state_dict', {})
+        inferred_atom_dim = None
+        inferred_bond_dim = None
+        atom_w = state_dict.get('dagt.atom_attention.atom_embedding.0.weight')
+        bond_w = state_dict.get('dagt.bond_mp.bond_embedding.0.weight')
+        if atom_w is not None:
+            inferred_atom_dim = int(atom_w.shape[1])
+        if bond_w is not None:
+            inferred_bond_dim = int(bond_w.shape[1])
         
         # Initialize LLM encoder
         self.llm_encoder = LLMEncoder(
@@ -41,8 +51,8 @@ class Predictor:
         
         # Initialize model
         self.model = DualBranchModel(
-            atom_dim=self.config.get('atom_dim', 41),
-            bond_dim=self.config.get('bond_dim', 10),
+            atom_dim=self.config.get('atom_dim', inferred_atom_dim or 41),
+            bond_dim=self.config.get('bond_dim', inferred_bond_dim or 10),
             graph_dim=self.config.get('graph_dim', 512),
             smiles_dim=self.config.get('smiles_dim', 3072),
             hidden_dim=self.config.get('hidden_dim', 512),

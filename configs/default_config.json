@@ -1,9 +1,11 @@
 {
-  "dataset_name": "HIV",
+  "dataset_name": "BACE",
   "data_dir": "dataset",
   "task_type": "classification",
+  "split_type": "random",
   "batch_size": 32,
   "num_epochs": 50,
+  "warmup_epochs": 5,
   "learning_rate": 1e-4,
   "weight_decay": 1e-5,
   "lambda_contrastive": 0.1,
@@ -12,13 +14,17 @@
   "bond_dim": 10,
   "graph_dim": 512,
   "smiles_dim": 3072,
+  "projection_dim": 512,
   "hidden_dim": 512,
   "num_layers": 3,
   "num_heads": 8,
+  "pool_type": "attention",
   "checkpoint_dir": "checkpoints",
+  "embeddings_dir": "embeddings",
+  "require_gpu": true,
+  "device": "cuda",
   "use_local_fallback": true,
   "openai_api_key": null,
   "num_workers": 0,
   "seed": 42
 }
-

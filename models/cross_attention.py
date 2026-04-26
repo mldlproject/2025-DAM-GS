@@ -92,12 +92,12 @@ class DualBranchModel(nn.Module):
     Complete dual-branch model combining DAGT and LLM with Cross-Attention.
     """
     
-    def __init__(self, atom_dim=41, bond_dim=10, graph_dim=512, smiles_dim=3072, 
-                 hidden_dim=512, num_classes=2, num_layers=3, num_heads=8):
+    def __init__(self, atom_dim=41, bond_dim=10, graph_dim=512, smiles_dim=3072,
+                 hidden_dim=512, num_classes=2, num_layers=3, num_heads=8, pool_type='attention'):
         super(DualBranchModel, self).__init__()
-        
+
         # DAGT encoder
-        self.dagt = DAGT(atom_dim, bond_dim, graph_dim, num_layers)
+        self.dagt = DAGT(atom_dim, bond_dim, graph_dim, num_layers, pool_type=pool_type)
         
         # Cross-Attention module
         self.cross_attention = CrossAttention(graph_dim, smiles_dim, hidden_dim, num_heads)

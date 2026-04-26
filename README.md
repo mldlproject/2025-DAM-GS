@@ -1,107 +1,136 @@
 # Dual-Attention Multimodal Framework for Molecular Property Prediction
 
-This repository implements a Dual-Attention Multimodal Framework for molecular property prediction, integrating both structural (graph) and semantic (SMILES) representations of molecules. The method combines a Dual-Attention Graph Transformer (DAGT) encoder with OpenAI's text-embedding-3-large model through a Cross-Attention module.
+This README reflects the current state of the code in this branch.
 
-## Architecture
-The proposed framework consists of:
-- **DAGT Encoder (fg)**: Maps molecular graphs to 512-dimensional representations
-- **Text-Embedding-3-Large Encoder (fs)**: Maps SMILES strings to 3072-dimensional representations  
-- **Cross-Attention Module**: Fuses graph and SMILES representations into a joint representation
-- **Predictor Head**: Makes final property predictions
+## Overview
 
-## Features
+The model uses two branches:
 
-- **Dual-Attention Graph Transformer (DAGT)**: 
-  - Bond-level message passing with attention
-  - Atom-level attention for global structure understanding
-- **Cross-Modal Fusion**: Cross-attention mechanism to combine graph and SMILES embeddings
-- **Contrastive Learning**: Aligns graph and SMILES embeddings in shared representation space
-- **Multi-Task Support**: Classification, regression, and multi-label prediction
+- Graph branch: `DAGT` in `models/dagt.py`
+- SMILES branch: 3072-d embeddings (prefer loading from precomputed `.npy` files)
+- Fusion: `CrossAttention` in `models/cross_attention.py`
+- Output heads: classification, multilabel classification, or regression
+
+The main training entry point is `run_training.py` (not `training/train.py` directly).
 
 ## Installation
 
-1. Clone this repository:
-```bash
-git clone https://github.com/mldlproject/2025-DAM-GS.git
-cd 2025-DAM-GS
-```
-
-2. Install dependencies:
 ```bash
 pip install -r requirements.txt
 ```
 
-Note: RDKit installation may require conda:
+If `rdkit-pypi` fails on your machine, install RDKit via conda:
+
 ```bash
 conda install -c conda-forge rdkit
 ```
 
-## Dataset
+## Data and Embeddings
 
-The repository supports the following molecular property prediction datasets:
-- **Classification**: HIV, BBBP, BACE
-- **Regression**: ESOL, FreeSolv, Lipophilicity
-- **Multi-label**: Tox21, SIDER, ClinTox
+The code currently supports these datasets (defined in `data/dataset.py`):
 
-Datasets should be placed in the `dataset/` directory with CSV format containing SMILES strings and labels.
+- Classification: `HIV`, `BACE`, `BBBP`
+- Regression: `ESOL`, `FreeSolv`, `Lipophilicity`
+- Multilabel: `Tox21`, `SIDER`, `ClinTox`
 
-## Usage
+Place CSV files in `dataset/` with names like:
 
-### Training
+- `dataset/HIV.csv`
+- `dataset/BACE.csv`
+- ...
 
-Train a model on a dataset:
+Each CSV must contain a `smiles` column.
+Label columns are fixed per dataset in `DATASET_CONFIG`.
+
+Precomputed SMILES embeddings (can be downloaded full in [here](https://drive.google.com/drive/folders/16nPisYpVO0pshPvIibRBJgoMooovuS-V?usp=drive_link)) (optional but recommended) should be stored as:
+
+- `embeddings/<DATASET>_embeddings.npy`
+
+Example: `embeddings/BACE_embeddings.npy`.
+
+If no `.npy` embeddings are found, the code uses `LLMEncoder`:
+
+- If `openai_api_key` is set and `use_local_fallback=false`: calls OpenAI embeddings API.
+- Default (`use_local_fallback=true`): random fallback embeddings (fine for smoke tests, not for reporting real model quality).
+
+## Training
+
+### Recommended command
 
 ```bash
-python training/train.py
+python run_training.py --config configs/default_config.json
 ```
 
-```python
-from training.train import Trainer
+### Example with overrides
 
-config = {
-    'dataset_name': 'HIV',
-    'data_dir': 'dataset',
-    'task_type': 'classification',
-    'batch_size': 32,
-    'num_epochs': 50,
-    'learning_rate': 1e-4,
-    'lambda_contrastive': 0.1,
-    'use_local_fallback': True,  # Use local model instead of OpenAI API
-    # 'openai_api_key': 'your-api-key',  # Optional: for OpenAI API
-}
-
-trainer = Trainer(config)
-trainer.train()
+```bash
+python run_training.py --dataset BACE --split_type scaffold --epochs 30 --batch_size 32 --num_seeds 3
 ```
+
+### Main CLI arguments (`run_training.py`)
+
+- `--config`: JSON config path (default `configs/default_config.json`)
+- `--dataset`: dataset name
+- `--task_type`: `classification|multilabel|regression` (if mismatched, code auto-syncs to dataset task)
+- `--batch_size`
+- `--epochs`
+- `--lr`
+- `--embeddings_dir`
+- `--split_type`: `random|scaffold`
+- `--num_seeds`: number of runs with consecutive seeds (for mean/std reporting)
+
+### GPU note
+
+Default is `require_gpu=true`. If CUDA is unavailable, set `require_gpu=false` in config.
+
+## Inference
+
+```bash
+python inference/predict.py --checkpoint checkpoints/best_model_BACE_seed42.pt --smiles "CCO" "c1ccccc1"
+```
+
+Arguments:
+
+- `--checkpoint` (required)
+- `--smiles` (one or more SMILES strings)
+- `--config` (optional; needed only if checkpoint does not include `config`)
+
+## Evaluation
+
+The repo includes `evaluate.py` for evaluating checkpoints on train/val/test splits and for scanning a checkpoint directory.
+
 
 ## Project Structure
 
-```
+```text
 .
-├── models/
-│   ├── dagt.py              # Dual-Attention Graph Transformer
-│   ├── cross_attention.py   # Cross-attention fusion module
-│   └── llm_encoder.py       # LLM integration
-├── data/
-│   └── dataset.py            # Data loading and preprocessing
-├── training/
-│   ├── train.py             # Training script
-│   └── losses.py             # Loss functions
-├── inference/
-│   └── predict.py            # Inference script
-├── configs/
-│   └── default_config.json  # Default configuration
-├── dataset/                  # Dataset directory
-├── checkpoints/              # Saved models
-└── requirements.txt          # Dependencies
+|-- configs/
+|   `-- default_config.json
+|-- data/
+|   `-- dataset.py
+|-- dataset/
+|   |-- BACE.csv
+|   |-- BBBP.csv
+|   |-- ClinTox.csv
+|   |-- ESOL.csv
+|   |-- FreeSolv.csv
+|   |-- HIV.csv
+|   |-- Lipophilicity.csv
+|   |-- SIDER.csv
+|   `-- Tox21.csv
+|-- embeddings/
+|   `-- *_embeddings.npy
+|-- inference/
+|   `-- predict.py
+|-- models/
+|   |-- cross_attention.py
+|   |-- dagt.py
+|   `-- llm_encoder.py
+|-- training/
+|   |-- losses.py
+|   `-- train.py
+|-- evaluate.py
+|-- requirements.txt
+|-- run_training.py
+`-- README.md
 ```
-
-## License
-
-This project is licensed under the MIT License.
-
-## Acknowledgments
-
-- OpenAI for text-embedding-3-large model
-- PyTorch Geometric for graph neural network utilities
-- RDKit for molecular processing

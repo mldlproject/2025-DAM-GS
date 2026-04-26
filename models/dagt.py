@@ -5,9 +5,9 @@ Dual-Attention Graph Transformer (DAGT) for molecular graph representation learn
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torch_geometric.nn import MessagePassing
+from torch_geometric.nn import MessagePassing, global_mean_pool, global_add_pool
 from torch_geometric.data import Data, Batch
-from torch_geometric.utils import to_dense_adj, dense_to_sparse
+from torch_geometric.utils import to_dense_adj, dense_to_sparse, softmax as pyg_softmax
 import math
 
 
@@ -126,11 +126,13 @@ class BondMessagePassing(nn.Module):
             if i in node_to_edges:
                 edges_to_i = node_to_edges[i]
                 
-                # Compute aggregation: Σ [h_ui^(t-1) - h_ji^(t-1)]
+                # Compute aggregation: Σ h_ui^(t-1) - h_ji^(t-1)
+                reverse_message = h_ij[e_idx]
                 for u_edge_idx in edges_to_i:
                     u = edge_index[0, u_edge_idx].item()
                     if u != j:  # Exclude j (u ∈ N(i)\j)
-                        r_ij[e_idx] += h_ij[u_edge_idx] - h_ij[e_idx]
+                        r_ij[e_idx] += h_ij[u_edge_idx]
+                r_ij[e_idx] -= reverse_message
         
         return r_ij
 
@@ -209,14 +211,14 @@ class DAGT(nn.Module):
     """
     Dual-Attention Graph Transformer for molecular representation learning.
     """
-    
-    def __init__(self, atom_dim=41, bond_dim=10, hidden_dim=512, num_layers=3):
+
+    def __init__(self, atom_dim=41, bond_dim=10, hidden_dim=512, num_layers=3, pool_type='attention'):
         super(DAGT, self).__init__()
         self.hidden_dim = hidden_dim
-        
+
         # Bond-level message passing
         self.bond_mp = BondMessagePassing(bond_dim, hidden_dim, num_layers)
-        
+
         # Atom-level attention
         self.atom_attention = AtomAttention(atom_dim, hidden_dim)
         
