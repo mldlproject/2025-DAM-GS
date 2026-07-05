@@ -44,10 +44,8 @@ class CrossAttention(nn.Module):
         # MLP for joint representation
         self.mlp = nn.Sequential(
             nn.Linear(hidden_dim, hidden_dim * 2),
-            nn.GELU(),
-            nn.Dropout(0.1),
+            nn.ReLU(),
             nn.Linear(hidden_dim * 2, hidden_dim),
-            nn.Dropout(0.1)
         )
         
     def forward(self, h_g, h_s):

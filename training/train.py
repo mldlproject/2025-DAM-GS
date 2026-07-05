@@ -306,9 +306,10 @@ class Trainer:
 
     def evaluate_test(self) -> dict:
         seed = self.config.get('seed', 42)
+        split_type = self.config.get('split_type', 'random')
         ckpt_path = os.path.join(
             self.config.get('checkpoint_dir', 'checkpoints'),
-            f"best_model_{self.config['dataset_name']}_seed{seed}.pt",
+            f"best_model_{self.config['dataset_name']}_{split_type}_seed{seed}.pt",
         )
         if os.path.exists(ckpt_path):
             ckpt = torch.load(ckpt_path, map_location=self.device)
@@ -349,7 +350,7 @@ class Trainer:
 
             if val_m['loss'] < self.best_val_loss:
                 self.best_val_loss = val_m['loss']
-                self.save_model(f"best_model_{dataset_name}_seed{seed}.pt")
+                self.save_model(f"best_model_{dataset_name}_{split_type}_seed{seed}.pt")
                 print(f"  Saved best (val_loss={self.best_val_loss:.4f})")
 
         self.save_training_history()
@@ -366,10 +367,11 @@ class Trainer:
 
     def save_training_history(self):
         seed = self.config.get('seed', 42)
+        split_type = self.config.get('split_type', 'random')
         os.makedirs(self.config.get('checkpoint_dir', 'checkpoints'), exist_ok=True)
         path = os.path.join(
             self.config.get('checkpoint_dir', 'checkpoints'),
-            f"history_{self.config['dataset_name']}_seed{seed}.json",
+            f"history_{self.config['dataset_name']}_{split_type}_seed{seed}.json",
         )
         with open(path, 'w') as f:
             json.dump({'train_losses': self.train_losses, 'val_losses': self.val_losses}, f, indent=2)

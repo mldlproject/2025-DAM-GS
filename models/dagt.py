@@ -80,6 +80,8 @@ class BondMessagePassing(nn.Module):
         Returns:
             h_ij: Bond embeddings [num_edges, hidden_dim]
         """
+        if edge_index.size(1) == 0:
+            return torch.zeros(0, self.hidden_dim, device=bond_features.device, dtype=bond_features.dtype)
         num_nodes = edge_index.max().item() + 1
         num_edges = edge_index.size(1)
         
@@ -102,38 +104,14 @@ class BondMessagePassing(nn.Module):
     
     def compute_bond_aggregation(self, edge_index, h_ij, num_nodes):
         """
-        Compute bond aggregation r_ij(t) = Σ_{u∈N(i)\j} [h_ui^(t-1) - h_ji^(t-1)]
-        Equation 2 from paper.
-        Optimized version using tensor operations.
+        Vectorized bond aggregation: r_ij = Σ_{u→i, u≠j} h_{u→i} - h_{j→i}
+        node_sum[i] = Σ_{all u→i} h_{u→i}, then r_ij = node_sum[i] - 2*h_{j→i}
         """
-        num_edges = edge_index.size(1)
-        r_ij = torch.zeros(num_edges, h_ij.size(1), device=h_ij.device)
-        
-        # Build node-to-edges mapping for efficiency
-        node_to_edges = {}
-        for e_idx in range(num_edges):
-            target_node = edge_index[1, e_idx].item()
-            if target_node not in node_to_edges:
-                node_to_edges[target_node] = []
-            node_to_edges[target_node].append(e_idx)
-        
-        # For each edge (i,j), aggregate from neighboring bonds
-        for e_idx in range(num_edges):
-            j = edge_index[0, e_idx].item()  # source node
-            i = edge_index[1, e_idx].item()  # target node
-            
-            # Get all edges incident to node i
-            if i in node_to_edges:
-                edges_to_i = node_to_edges[i]
-                
-                # Compute aggregation: Σ h_ui^(t-1) - h_ji^(t-1)
-                reverse_message = h_ij[e_idx]
-                for u_edge_idx in edges_to_i:
-                    u = edge_index[0, u_edge_idx].item()
-                    if u != j:  # Exclude j (u ∈ N(i)\j)
-                        r_ij[e_idx] += h_ij[u_edge_idx]
-                r_ij[e_idx] -= reverse_message
-        
+        hidden_dim = h_ij.size(1)
+        node_sum = torch.zeros(num_nodes, hidden_dim, device=h_ij.device, dtype=h_ij.dtype)
+        target_idx = edge_index[1].unsqueeze(1).expand(-1, hidden_dim)
+        node_sum.scatter_add_(0, target_idx, h_ij)
+        r_ij = node_sum[edge_index[1]] - 2.0 * h_ij
         return r_ij
 
 
@@ -215,14 +193,19 @@ class DAGT(nn.Module):
     def __init__(self, atom_dim=41, bond_dim=10, hidden_dim=512, num_layers=3, pool_type='attention'):
         super(DAGT, self).__init__()
         self.hidden_dim = hidden_dim
+        self.pool_type = pool_type
 
         # Bond-level message passing
         self.bond_mp = BondMessagePassing(bond_dim, hidden_dim, num_layers)
 
         # Atom-level attention
         self.atom_attention = AtomAttention(atom_dim, hidden_dim)
-        
-        # Graph-level pooling
+
+        # Learnable gate for attention pooling
+        if pool_type == 'attention':
+            self.pool_gate = nn.Linear(hidden_dim, 1)
+
+        # Graph-level pooling MLP (applied after pooling)
         self.graph_pooling = nn.Sequential(
             nn.Linear(hidden_dim, hidden_dim),
             nn.LayerNorm(hidden_dim),
@@ -248,9 +231,10 @@ class DAGT(nn.Module):
         
         # Step 2: Aggregate bond embeddings per atom
         num_nodes = x.size(0)
-        h_i_bond = torch.zeros(num_nodes, self.hidden_dim, device=x.device)
-        h_i_bond.scatter_add_(0, edge_index[1].unsqueeze(1).expand(-1, self.hidden_dim), h_ij)
-        
+        h_i_bond = torch.zeros(num_nodes, self.hidden_dim, device=x.device, dtype=x.dtype)
+        if h_ij.size(0) > 0:
+            h_i_bond.scatter_add_(0, edge_index[1].unsqueeze(1).expand(-1, self.hidden_dim), h_ij)
+
         # Step 3: Atom-level attention
         h_i = self.atom_attention(x, h_i_bond)  # [num_nodes, hidden_dim]
         

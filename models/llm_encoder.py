@@ -4,7 +4,6 @@ Integration with OpenAI's text-embedding-3-large model for SMILES encoding.
 
 import torch
 import torch.nn as nn
-from openai import OpenAI
 import numpy as np
 from typing import List, Union
 
@@ -14,15 +13,18 @@ class LLMEncoder:
     Wrapper for OpenAI's text-embedding-3-large model.
     Note: This requires an OpenAI API key. For local testing, we provide a fallback.
     """
-    
+
     def __init__(self, api_key=None, use_local_fallback=True):
         self.api_key = api_key
         self.use_local_fallback = use_local_fallback
         self.embedding_dim = 3072
-       
-        self.client = OpenAI(api_key=api_key)
-    
-    
+
+        self.client = None
+        if api_key and not use_local_fallback:
+            from openai import OpenAI
+            self.client = OpenAI(api_key=api_key)
+
+
     def encode(self, smiles_list: List[str]) -> torch.Tensor:
         """
         Encode SMILES strings to embeddings.

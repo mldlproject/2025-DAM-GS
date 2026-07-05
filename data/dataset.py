@@ -444,16 +444,24 @@ def scaffold_split(
         key = _murcko_scaffold(sample["smiles"])
         scaffold_to_indices.setdefault(key, []).append(idx)
 
-    groups = [
-        v for _, v in sorted(
-            scaffold_to_indices.items(),
-            key=lambda kv: (-len(kv[1]), kv[0]),
-        )
-    ]
-
     n = len(dataset)
     train_cut = int(np.floor(frac_train * n))
     val_target = int(np.floor(frac_val * n))
+    test_target = n - train_cut - val_target
+
+    # Scaffolds bigger than half the val/test target are kept out of the
+    # random shuffle (a single huge scaffold group would otherwise be able to
+    # swamp a whole split); everything else is shuffled per-seed so that each
+    # seed sees a different train/val/test assignment.
+    index_sets = list(scaffold_to_indices.values())
+    big_threshold = max(val_target, test_target) / 2
+    big_sets = [s for s in index_sets if len(s) > big_threshold]
+    small_sets = [s for s in index_sets if len(s) <= big_threshold]
+
+    rng = np.random.RandomState(seed)
+    rng.shuffle(big_sets)
+    rng.shuffle(small_sets)
+    groups = big_sets + small_sets
 
     train_idx: List[int] = []
     val_idx: List[int] = []

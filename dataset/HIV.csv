@@ -136,7 +136,6 @@ ClC(Cl)(Cl)C1OCOC(C(Cl)(Cl)Cl)OCO1,0
 O=C1c2c(O)cc(O)cc2OC(c2ccc(O)c(O)c2)C1O,0
 O=C(CCc1ccc(O)cc1)c1c(O)cc(O)cc1OC1OC(CO)C(O)C(O)C1O,0
 N=C1NC(=O)CS1,0
-O=C1O[Al]23(OC1=O)(OC(=O)C(=O)O2)OC(=O)C(=O)O3,0
 O=C1C[N+]23CC[N+]45CC(=O)O[Ni-4]24(O1)(OC(=O)C3)OC(=O)C5,0
 CC(=O)c1cc2c(cc1C(C)C)CCC1C(C)(C#N)CCCC21C,0
 COC(=O)C1(C)CCCC2(C)c3cc(Br)c(C(C)C)cc3CCC12,0
@@ -986,7 +985,6 @@ O=C1OC(=O)C2=C1C1c3ccccc3C2c2ccccc21,0
 O=C(O)C1C2c3ccccc3C(O)C1(C(=O)O)c1ccccc12,0
 Oc1cc2c(nn1)CCCC2,0
 N=c1nn[nH]n1-c1ccccc1,0
-Cc1ccc([B-2]2(c3ccc(C)cc3)=NCCO2)cc1,0
 CC(O)(c1ccccc1)c1nccc2ccccc12,0
 CC(CCC(=O)NCCS(=O)(=O)O)C1CCC2C3C(O)CC4CC(O)CCC4(C)C3CC(O)C12C,0
 O=C(O)C=CC(=O)Nc1ccc(S(=O)(=O)c2ccc(NC(=O)C=CC(=O)O)cc2)cc1,0
@@ -12881,7 +12879,6 @@ CC(NC(=O)C(C)NC(=O)C(N)CCP(C)(=O)O)C(=O)O,0
 Oc1cc(O)c2c(-c3c(O)c(-c4ccc(O)c(O)c4)[o+]c4cc(O)cc(O)c34)c(O)c(-c3ccc(O)c(O)c3)[o+]c2c1.[Cl-],0
 Cc1cc(O)c2cnncc3c(O)cc(C)c4c(=O)oc5c(CO)c(O)c(C(=O)O)c(cnncc6c(C(=O)O)c(O)c(CO)c7oc(=O)c1c2oc67)c5oc34,0
 CC1OC(OCC2COC(O)(Oc3c(-c4ccc(O)c(O)c4)oc4cc(O)cc(O)c4c3=O)C(O)C2O)C(O)C(O)C1O,0
-Oc1ccc(C2Oc3cc(O)cc4c3C(=[O+][AlH3-3]35([O+]=C6c7c(cc(O)cc7[OH+]3)OC(c3ccc(O)cc3O)C6O)([O+]=C3c6c(cc(O)cc6[OH+]5)OC(c5ccc(O)cc5O)C3O)[OH+]4)C2O)c(O)c1,0
 Cc1nc(=N)[nH]n1C1OCC(O)C(O)C1O,0
 CC(=O)OC1C(CCl)OC(N=[N+]=[N-])C(OC(C)=O)C1OC(C)=O,0
 COc1ccc(C=NNC(=N)N)c(C(=O)O)c1OC.O=[N+]([O-])O,0
@@ -18292,7 +18289,6 @@ Cn1c(=O)c2c(n(C)c1=O)=NC=c1c(=O)n(C)c(=O)n(C)c1=NC=2,0
 O=C(O)CCC(NC(=O)c1ccc(-n2nc3ccc(=O)cc-3[nH]c2=O)cc1)C(=O)O,0
 Nc1nc(O)c2ncn(CCN(CCCl)CCCl)c2n1,0
 COc1ccc2c(=O)c(C)c(C=Cc3ccco3)oc2c1,0
-CC1=C2[OH+][AlH3-3]34([O+]=C2C=CN1C)([O+]=C1C=CN(C)C(C)=C1[OH+]3)[O+]=C1C=CN(C)C(C)=C1[OH+]4,0
 Cc1cc(O)c2c(c1)CC(O)C1=C2C(=O)c2c(O)ccc(OC3CC(O)C(OC4CC(OC5CCC(OC6CC(O)C(OC7CC(OC8CCC(O)C(C)O8)C(O)C(C)O7)C(C)O6)C(C)O5)C(O)C(C)O4)C(C)O3)c2C1=O,0
 COc1ccc([N+](=O)[O-])c2c(NCCCN(C)C)ccnc12.Cl,0
 CN(C)CCNC(=O)c1nc([N+](=O)[O-])cn1C.Cl,0
@@ -30783,8 +30779,6 @@ N=c1[nH]nc(-c2ccccc2O)o1,0
 S=c1[nH]nc(-c2ccccc2Cl)o1,0
 COc1ccc(N2NC(c3ccccc3)(c3ccccc3)C(C)C2=O)cc1,0
 CC1C(=O)N(c2ccccc2)NC12CCCc1ccccc12,0
-CC(c1cccs1)=[N+]1[N-]C(N)=[S+][AlH3-]12[OH+]B(c1ccccc1)[OH+]2,0
-CC(c1ccccn1)=[N+]1[N-]C(N)=[S+][AlH3-]12[OH+]B(c1ccccc1)[OH+]2,0
 CN1C(NC#N)=NP(=O)(O)C1(C)C.N,0
 CCCN.CCOP1(=O)N=C(NC#N)N(C)C1(C)C,0
 CCOP1(=O)N=C(NC(=N)N(CC)CC)N(C)C1(C)C,0
@@ -35727,7 +35721,6 @@ Cc1cn(C(C)OCCN(O)C(=O)Oc2ccccc2)c(=O)[nH]c1=O,0
 CC(C)(C)[Si](C)(C)OCC1OC(n2ccc(=O)[nH]c2=O)C(O[Si](C)(C)C(C)(C)C)C1CC#N,0
 Cc1cn(C(C)OCCN(O)C(N)=O)c(=O)[nH]c1=O,0
 COc1ccc(C2OCC3OC(n4cc(C)c(=O)[nH]c4=O)CC3N2OC(C)=O)cc1,0
-[Na+].c1ccc([SH+][GeH2+]2[SH+]c3ccccc3[SH+]2)c([SH+][GeH2+]2[SH+]c3ccccc3[SH+]2)c1,0
 CC[N+](CC)(CC)CC.c1ccc2c(c1)[SH+][Tl-]1([SH+]2)[SH+]c2ccccc2[SH+]1,0
 [Na+].c1ccc2c(c1)[SH+][Sn]1([SH+]2)[SH+]c2ccccc2[SH+]1,0
 [Na+].c1ccc2c(c1)[SH+][Pb]1([SH+]2)[SH+]c2ccccc2[SH+]1,0
