@@ -19,8 +19,6 @@
   "hidden_dim": 512,
   "num_layers": 3,
   "num_heads": 8,
-  "smiles_bottleneck": 64,
-  "pool_type": "attention",
   "checkpoint_dir": "checkpoints",
   "embeddings_dir": "embeddings",
   "require_gpu": true,
